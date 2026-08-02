@@ -9,10 +9,6 @@
 #define MAX_INSTANCES 4096
 #define MAX_TILES     1024
 
-/* ------------------------------------------------------------------ */
-/* Instances                                                           */
-/* ------------------------------------------------------------------ */
-
 typedef struct Instance Instance;
 
 typedef struct {

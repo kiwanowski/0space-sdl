@@ -403,7 +403,6 @@ static void char_step(Instance *self)
 
         if (c->bomb == -1) {
             c->bombammo--;
-
             bool planting = fabsf(angle_between(c->gundir, c->showdir - 90.0f)) < 10.0f
                           && c->onground;
             if (planting) {
@@ -483,11 +482,9 @@ static void char_step(Instance *self)
         if (!instance_meets(self, b)) continue;
         if (b->s.mv.owner == c->player && b->s.mv.life <= 5) continue;
         char_kill(self, gm_point_direction(0, 0, b->s.mv.hspeed, b->s.mv.vspeed));
-
         if (b->s.mv.life > 80) instance_destroy(b);
         return;
     }
-
     Instance *wave = instance_place(self, self->x, self->y, OBJ_SHOCKWAVE);
     if (wave && wave->image_index < 6.0f) {
         char_kill(self, gm_point_direction(0, 0, wave->s.mv.hspeed, wave->s.mv.vspeed));
@@ -541,7 +538,13 @@ static void char_draw(Instance *self)
     float ox = roundf(gm_lengthdir_x(c->bounce, c->dir - 90.0f));
     float oy = roundf(gm_lengthdir_y(c->bounce, c->dir - 90.0f));
 
-    if (c->knife > 0) {
+    if (c->bomb > 0 && c->bombammo > 0) {
+
+        const int ba = 8;
+        int f = (int)((c->bombspeed / 5.0f) * ba) + c->skin * 9;
+        draw_sprite_ext(SPR_BOMBARM, f, self->x + ox, self->y + oy,
+                        1.0f, (float)c->hs, c->gundir, 0xFFFFFF, 1.0f);
+    } else if (c->knife > 0) {
         int ka = 13;
         c->img2 = (int)floorf(ka - ((float)c->knife / c->knifeset) * ka);
         draw_sprite_ext(SPR_KNIFE, c->img2 + 14 * c->skin,

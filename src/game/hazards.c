@@ -39,7 +39,6 @@ static void laser_create(Instance *self)
 
 static void jumpad_create(Instance *self)
 {
-    /* Flip to face away from whichever side the wall is on. */
     if (place_meeting(self, self->x, self->y - 16, OBJ_BLOCK)) {
         self->y += 16;
         self->image_yscale = -1.0f;
@@ -216,7 +215,7 @@ static void lava_draw(Instance *self)
     LavaState *l = &self->s.lava;
 
     uint32_t color = (((int)l->anim) & 1)
-                   ? 0x0000FFu                                   /* c_red */
+                   ? 0x0000FFu
                    : merge_color(0x0000FFu, 0x00FFFFu, 0.1f + gm_random(0.1f));
 
     draw_set_alpha(1.0f);

@@ -52,7 +52,6 @@ static void rockdebri_step(Instance *self)
 
     self->image_angle += m->friction;
 
-    /* Other_AnimationEnd */
     if (self->sprite_index >= 0) {
         int n = sprite_defs[self->sprite_index].frame_count;
         if (n > 0 && self->image_index + self->image_speed >= n)

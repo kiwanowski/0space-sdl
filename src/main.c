@@ -23,7 +23,7 @@ int main(int argc, char **argv)
     float bomb_x = -1, bomb_y = -1;
     int   reload_at  = -1;
     int   shot_at    = -1;
-    const char *hold = NULL;
+    const char *hold[6]; int hold_count = 0;
     int   fire_at[8]; int fire_count = 0;
     int   bullet_at  = -1;
     bool  census     = false;
@@ -46,7 +46,10 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i], "--census"))                  census = true;
         else if (!strcmp(argv[i], "--reload") && i + 1 < argc)   reload_at = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--shot") && i + 1 < argc)     shot_at = atoi(argv[++i]);
-        else if (!strcmp(argv[i], "--hold") && i + 1 < argc)     hold = argv[++i];
+        else if (!strcmp(argv[i], "--hold") && i + 1 < argc) {
+            if (hold_count < 6) hold[hold_count++] = argv[++i];
+            else i++;
+        }
         else if (!strcmp(argv[i], "--bullet") && i + 1 < argc)   bullet_at = atoi(argv[++i]);
         else if (!strcmp(argv[i], "--fire") && i + 1 < argc) {
             if (fire_count < 8) fire_at[fire_count++] = atoi(argv[++i]);
@@ -73,12 +76,16 @@ int main(int argc, char **argv)
 
     objects_register();
 
-    if (hold) {
-        if      (!strcmp(hold, "right")) input_force(0, IN_RIGHT, true);
-        else if (!strcmp(hold, "left"))  input_force(0, IN_LEFT,  true);
-        else if (!strcmp(hold, "up"))    input_force(0, IN_UP,    true);
-        else if (!strcmp(hold, "down"))  input_force(0, IN_DOWN,  true);
-        else { fprintf(stderr, "unknown --hold direction: %s\n", hold); return 1; }
+    for (int k = 0; k < hold_count; k++) {
+        const char *h = hold[k];
+        if      (!strcmp(h, "right")) input_force(0, IN_RIGHT, true);
+        else if (!strcmp(h, "left"))  input_force(0, IN_LEFT,  true);
+        else if (!strcmp(h, "up"))    input_force(0, IN_UP,    true);
+        else if (!strcmp(h, "down"))  input_force(0, IN_DOWN,  true);
+        else if (!strcmp(h, "bomb"))  input_force(0, IN_BOMB,  true);
+        else if (!strcmp(h, "jump"))  input_force(0, IN_JUMP,  true);
+        else if (!strcmp(h, "knife")) input_force(0, IN_KNIFE, true);
+        else { fprintf(stderr, "unknown --hold button: %s\n", h); return 1; }
     }
 
     world.pending_room = -1;

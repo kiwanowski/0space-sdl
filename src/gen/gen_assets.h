@@ -30,8 +30,8 @@ typedef struct {
     int32_t width, height, speed;
     uint32_t clear_color;
     int32_t view_w, view_h, hborder, vborder;
-    int32_t control_open;   /* Control.open, from room creation code */
-    int32_t view_count;     /* editor visible-view flags; runtime count comes from screenset() */
+    int32_t control_open;
+    int32_t view_count;
     const RoomInstance *instances; int32_t instance_count;
     const RoomTile *tiles; int32_t tile_count;
     const RoomBackground *backgrounds; int32_t background_count;

@@ -17,8 +17,6 @@ static void play_land_sound(void)
     sound_play(lands[gm_irandom(4)]);
 }
 
-/* ------------------------------------------------------------------ */
-
 void explode(float x, float y, int team)
 {
     for (int i = 0; i < world.instance_count; i++) {
@@ -242,8 +240,6 @@ static void spacemine_draw(Instance *self)
                     self->x, self->y, 1.0f, 1.0f, self->image_angle,
                     0xFFFFFF, 1.0f);
 }
-
-/* ---------------------------- shockwave --------------------------- */
 
 static void shockwave_slow(Instance *self) { self->s.mv.hspeed /= 5.0f; self->s.mv.vspeed /= 5.0f; }
 

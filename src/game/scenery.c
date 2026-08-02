@@ -39,7 +39,7 @@ static void sat_create(Instance *self) { self->s.gen.imgspd = 1.0f; }
 
 static void sandfalldown_create(Instance *self)
 {
-    self->s.gen.dir = 1.0f;     /* push */
+    self->s.gen.dir = 1.0f;
 }
 
 static void sandfallup_create(Instance *self)

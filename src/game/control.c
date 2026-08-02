@@ -80,6 +80,18 @@ static void control_draw(Instance *self)
         draw_rectangle(-border, -border, 1, rh + border, false);
         draw_rectangle(rw + border, -border, rw - 1, rh + border, false);
     }
+
+    for (int i = 0; i < world.instance_count; i++) {
+        Instance *in = &world.instances[i];
+        if (!in->active || in->obj != OBJ_CHAR) continue;
+        const CharState *c = &in->s.ch;
+        if (c->bomb > 0 && c->bombammo > 0) {
+            float d = (c->bombspeed / 5.0f) * 30.0f;
+            draw_sprite(SPR_AIMER, c->skin,
+                        in->x + gm_lengthdir_x(d, c->gundir),
+                        in->y + gm_lengthdir_y(d, c->gundir));
+        }
+    }
     (void)self;
 }
 
