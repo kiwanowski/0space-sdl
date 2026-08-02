@@ -174,6 +174,27 @@ static void char_read_input(Instance *self)
     }
 }
 
+static void char_knife_reach(Instance *self)
+{
+    CharState *c = &self->s.ch;
+
+    if (!(c->knife > 0 && c->img2 > 2 && c->img2 < 7)) return;
+
+    float px = self->x + gm_lengthdir_x(8.0f, c->gundir);
+    float py = self->y + gm_lengthdir_y(8.0f, c->gundir);
+
+    Instance *bomb = collision_circle(px, py, 7.0f, OBJ_SPACEBOMB, self);
+    if (bomb && bomb->s.bomb.hitid != self->id) {
+        sound_play(SND_S_HITBOMB);
+        bomb->s.bomb.hitid   = self->id;
+        bomb->s.bomb.xspeed += gm_lengthdir_x(6.0f, c->gundir);
+        bomb->s.bomb.yspeed += gm_lengthdir_y(6.0f, c->gundir);
+    }
+
+    Instance *block = collision_circle(px, py, 7.0f, OBJ_DESTRUCTABLE, self);
+    if (block) destructable_break(block, c->gundir);
+}
+
 static void char_animate(Instance *self)
 {
     CharState *c = &self->s.ch;
@@ -294,6 +315,7 @@ static void char_step(Instance *self)
 
     char_animate(self);
     char_read_input(self);
+    char_knife_reach(self);
 
     float fx = gm_lengthdir_x(1.0f, c->dir - 90.0f);
     float fy = gm_lengthdir_y(1.0f, c->dir - 90.0f);
@@ -335,6 +357,18 @@ static void char_step(Instance *self)
             sound_play(gm_irandom(1) == 1 ? SND_S_JUMP : SND_S_JUMP2);
 
             if (place_meeting(self, self->x + fx, self->y + fy, OBJ_JUMPAD)) {
+                for (int i = 0; i < 5; i++) {
+                    Instance *p = instance_create(self->x + mirand(2.0f),
+                                                  self->y + mirand(2.0f),
+                                                  OBJ_BULLETPART);
+                    if (!p) continue;
+                    float d = c->dir + 90.0f + mirand(45.0f);
+                    float s = 1.0f + gm_random(4.0f);
+                    p->sprite_index = SPR_BULLETPART;
+                    p->image_speed  = 0.2f + gm_random(0.5f);
+                    p->s.mv.hspeed  = gm_lengthdir_x(s, d);
+                    p->s.mv.vspeed  = gm_lengthdir_y(s, d);
+                }
                 sound_play(SND_S_MEGAJUMP);
                 c->jumpspd = 5.0f;
             }
@@ -475,7 +509,6 @@ static void char_step(Instance *self)
         char_kill(self, gm_point_direction(0, 0, c->xspeed, c->yspeed));
         return;
     }
-
     for (int i = 0; i < world.instance_count; i++) {
         Instance *b = &world.instances[i];
         if (!b->active || b->obj != OBJ_BULLET) continue;
@@ -490,7 +523,6 @@ static void char_step(Instance *self)
         char_kill(self, gm_point_direction(0, 0, wave->s.mv.hspeed, wave->s.mv.vspeed));
         return;
     }
-
     if (lava_hits_any(self)) {
         char_burn(self, 0.25f);
         return;
@@ -539,7 +571,6 @@ static void char_draw(Instance *self)
     float oy = roundf(gm_lengthdir_y(c->bounce, c->dir - 90.0f));
 
     if (c->bomb > 0 && c->bombammo > 0) {
-
         const int ba = 8;
         int f = (int)((c->bombspeed / 5.0f) * ba) + c->skin * 9;
         draw_sprite_ext(SPR_BOMBARM, f, self->x + ox, self->y + oy,

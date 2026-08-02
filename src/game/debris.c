@@ -65,15 +65,18 @@ static void blood_create(Instance *self)
     self->s.mv.friction = 0.05f;
 }
 
-static void blood_splat(Instance *self)
+static void blood_splat(Instance *self, Instance *block)
 {
-    Instance *w = instance_create(self->x, self->y, OBJ_BLOODONWALL);
-    if (w) {
-        w->image_angle = self->image_angle;
-        w->image_speed = 0.0f;
-        w->image_index = (float)gm_irandom(3);
-    }
-    instance_destroy(self);
+    float cx = block->x + 8.0f, cy = block->y + 8.0f;
+
+    Instance *w = instance_create(cx, cy, OBJ_BLOODONWALL);
+    if (!w) return;
+
+    w->image_angle = (float)gm_round(
+        gm_point_direction(cx, cy, self->x, self->y) / 90.0f) * 90.0f;
+    w->image_speed = 0.0f;
+    w->image_index = (float)(int)gm_random(
+        (float)sprite_defs[SPR_BLOODONWALL].frame_count);
 }
 
 static void blood_step(Instance *self)
@@ -86,10 +89,26 @@ static void blood_step(Instance *self)
         m->hspeed = gm_lengthdir_x(spd, dir);
         m->vspeed = gm_lengthdir_y(spd, dir);
     }
-    mover_step(self, m->hspeed, m->vspeed, OBJ_BLOCK, blood_splat, blood_splat);
-    if (!self->active) return;
 
-    if (++m->timer > 90 || spd <= 0.05f) instance_destroy(self);
+    self->x += m->hspeed;
+    self->y += m->vspeed;
+
+    Instance *block = instance_place(self, self->x, self->y, OBJ_MEGABLOCK);
+    if (block) {
+        m->hspeed /= 2.0f;
+        m->vspeed /= 2.0f;
+        self->image_speed = 1.0f;
+        if (!m->wallhit) {
+            m->wallhit = true;
+            blood_splat(self, block);
+        }
+    }
+
+    if (self->sprite_index >= 0) {
+        int n = sprite_defs[self->sprite_index].frame_count;
+        if (n > 0 && self->image_index + self->image_speed >= n)
+            instance_destroy(self);
+    }
 }
 
 static void sand_create(Instance *self)
