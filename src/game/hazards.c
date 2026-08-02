@@ -58,7 +58,7 @@ static void pusher_step(Instance *self)
     (void)self;
 }
 
-static void destructable_break(Instance *self, float hitdir)
+void destructable_break(Instance *self, float hitdir)
 {
     tile_layer_delete_at(-6, self->x, self->y);
 

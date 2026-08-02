@@ -22,6 +22,8 @@ void char_kill(Instance *self, float otherdir);
 
 void explode(float x, float y, int team);
 
+void destructable_break(Instance *self, float hitdir);
+
 void spawn_death_effect(float x, float y, float dir, float otherdir, int skin);
 void spawn_charred(float x, float y, float showdir, float spin,
                    float xspeed, float yspeed);

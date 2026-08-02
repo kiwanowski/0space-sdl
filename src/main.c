@@ -26,6 +26,8 @@ int main(int argc, char **argv)
     const char *hold[6]; int hold_count = 0;
     int   fire_at[8]; int fire_count = 0;
     int   bullet_at  = -1;
+    int   jump_at[8]; int jump_count = 0;
+    float warp_x = -1, warp_y = -1;
     bool  census     = false;
     float impulse_x = 0, impulse_y = 0;
 
@@ -54,6 +56,14 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i], "--fire") && i + 1 < argc) {
             if (fire_count < 8) fire_at[fire_count++] = atoi(argv[++i]);
             else i++;
+        }
+        else if (!strcmp(argv[i], "--jump") && i + 1 < argc) {
+            if (jump_count < 8) jump_at[jump_count++] = atoi(argv[++i]);
+            else i++;
+        }
+        else if (!strcmp(argv[i], "--warp") && i + 2 < argc) {
+            warp_x = (float)atof(argv[++i]);
+            warp_y = (float)atof(argv[++i]);
         }
         else if (!strcmp(argv[i], "--impulse") && i + 2 < argc) {
             impulse_x = (float)atof(argv[++i]);
@@ -102,10 +112,17 @@ int main(int argc, char **argv)
         input_force(0, IN_SHOOT, false);
         for (int k = 0; k < fire_count; k++)
             if (frame == fire_at[k]) input_force(0, IN_SHOOT, true);
+        input_force(0, IN_JUMP, false);
+        for (int k = 0; k < jump_count; k++)
+            if (frame == jump_at[k]) input_force(0, IN_JUMP, true);
 
         input_new_frame();
         if (input_held(0, IN_QUIT)) input_request_quit();
 
+        if (frame == 1 && warp_x >= 0) {
+            Instance *p = instance_find(OBJ_CHAR);
+            if (p) { p->x = warp_x; p->y = warp_y; p->s.ch.camx = warp_x; p->s.ch.camy = warp_y; }
+        }
         if (frame == 1 && (impulse_x != 0 || impulse_y != 0)) {
             Instance *p = instance_find(OBJ_CHAR);
             if (p) { p->s.ch.xspeed = impulse_x; p->s.ch.yspeed = impulse_y; }
@@ -151,7 +168,9 @@ int main(int argc, char **argv)
 
         if (trace) {
             Instance *bb = instance_find(OBJ_SPACEBOMB);
-            if (bb) printf("f%-4d t=%3d spd=%.3f flash=%.2f\n", frame, bb->s.bomb.t, bb->image_speed, bb->s.bomb.flash);
+            if (bb) printf("f%-4d bomb x=%7.2f y=%7.2f spd=(%6.2f,%6.2f) t=%3d hitid=%d\n",
+                           frame, bb->x, bb->y, bb->s.bomb.xspeed, bb->s.bomb.yspeed,
+                           bb->s.bomb.t, bb->s.bomb.hitid);
             Instance *p = instance_find(OBJ_CHAR);
             if (p)
                 printf("f%-4d x=%7.2f y=%7.2f dir=%7.2f ground=%d air=%-4d "

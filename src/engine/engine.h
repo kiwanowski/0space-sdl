@@ -77,6 +77,7 @@ typedef struct {
     int   team, owner;
     int   dead, deadtime;
     int   settime, set;
+    int   hitid;
     float image_single;
 } BombState;
 
