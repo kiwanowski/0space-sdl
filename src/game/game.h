@@ -26,6 +26,7 @@ void spawn_death_effect(float x, float y, float dir, float otherdir, int skin);
 void spawn_charred(float x, float y, float showdir, float spin,
                    float xspeed, float yspeed);
 void spawn_chargeup(Instance *player, float gundir, float xspeed, float yspeed);
+void spawn_flame(float x, float y, float xspeed, float yspeed);
 
 bool lava_hits(const Instance *self, const Instance *other);
 bool lava_hits_any(const Instance *other);

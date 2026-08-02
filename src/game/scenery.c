@@ -131,7 +131,6 @@ static void baydoorcontrol_step(Instance *self)
             sound_stop(SND_S_ALARM);
             sound_play(SND_S_WIND);
         }
-
         for (int i = 0; i < world.instance_count && a; i++) {
             Instance *in = &world.instances[i];
             if (!in->active || in->obj != OBJ_CHAR) continue;
@@ -257,15 +256,7 @@ static void charred_step(Instance *self)
 
     if (++m->timer > 2) {
         m->timer = 0;
-        Instance *p = instance_create(self->x, self->y, OBJ_BULLETPART);
-        if (p) {
-            p->sprite_index = SPR_FLAME;
-            p->depth = 4;
-            p->image_speed = 0.8f + gm_random(0.3f);
-            float d = gm_random(360.0f);
-            p->s.mv.hspeed = gm_lengthdir_x(0.5f, d) - m->hspeed / 2.0f;
-            p->s.mv.vspeed = gm_lengthdir_y(0.5f, d) - m->vspeed / 2.0f;
-        }
+        spawn_flame(self->x, self->y, m->hspeed, m->vspeed);
     }
     self->image_angle += m->friction;
 }

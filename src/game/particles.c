@@ -118,6 +118,20 @@ static void bulletpart_step(Instance *self)
     }
 }
 
+void spawn_flame(float x, float y, float xspeed, float yspeed)
+{
+    Instance *p = instance_create(x, y, OBJ_BULLETPART);
+    if (!p) return;
+
+    float d = gm_random(360.0f);
+    p->sprite_index = SPR_FLAME;
+    p->depth        = 4;
+    p->image_speed  = 0.8f + gm_random(0.3f);
+    p->s.mv.hspeed  = gm_lengthdir_x(0.5f, d) - xspeed / 2.0f;
+    p->s.mv.vspeed  = gm_lengthdir_y(0.5f, d) - yspeed / 2.0f;
+    p->image_angle  = d;
+}
+
 static void sparkline_create(Instance *self)
 {
     MoverState *m = &self->s.mv;

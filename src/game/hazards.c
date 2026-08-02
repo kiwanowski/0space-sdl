@@ -271,12 +271,23 @@ bool lava_hits_any(const Instance *other)
 
 static void lava_consume(Instance *self)
 {
+    Instance *gib = NULL, *bullet = NULL;
+
     for (int i = 0; i < world.instance_count; i++) {
         Instance *in = &world.instances[i];
         if (!in->active) continue;
-        if (in->obj != OBJ_GIBS && in->obj != OBJ_BULLET) continue;
-        if (lava_hits(self, in)) instance_destroy(in);
+        if (in->obj == OBJ_GIBS) {
+            if (!gib && lava_hits(self, in)) gib = in;
+        } else if (in->obj == OBJ_BULLET) {
+            if (!bullet && lava_hits(self, in)) bullet = in;
+        }
     }
+
+    if (gib) {
+        spawn_flame(gib->x, gib->y, gib->s.mv.hspeed, gib->s.mv.vspeed);
+        instance_destroy(gib);
+    }
+    if (bullet) instance_destroy(bullet);
 }
 
 void hazards_register(void)
